@@ -100,7 +100,7 @@
           <div class="file-item">
             <MimeIcon
               :content-type="file.httpMetadata.contentType"
-              :thumbnail="`/raw/_$flaredrive$/thumbnails/${createThumbnail(file)}.png`"
+              :thumbnail="`/raw/_$flaredrive$/thumbnails/${await createThumbnail(file)}.png`"
             />
             <div>
               <div class="file-name" v-text="file.key.split('/').pop()"></div>
@@ -412,7 +412,7 @@ export default {
       setTimeout(() => this.processUploadQueue());
     },
 
-    createThumbnail(file) {
+    async createThumbnail(file) {
       const thumbnailschildlen = fetch(`/api/children/_$flaredrive$/thumbnails/`)
         .then((value) => value.json())
         .then((value) => value.value);
