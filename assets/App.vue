@@ -100,7 +100,7 @@
           <div class="file-item">
             <MimeIcon
               :content-type="file.httpMetadata.contentType"
-              :thumbnail="`/raw/_$flaredrive$/thumbnails/${await createThumbnail(file)}.png`"
+              :thumbnail="`/raw/_$flaredrive$/thumbnails/${createThumbnail(file)}.png`"
             />
             <div>
               <div class="file-name" v-text="file.key.split('/').pop()"></div>
@@ -412,21 +412,21 @@ export default {
       setTimeout(() => this.processUploadQueue());
     },
 
-    async createThumbnail(file) {
+    createThumbnail(file) {
       const thumbnailschildlen = fetch(`/api/children/_$flaredrive$/thumbnails/`)
         .then((value) => value.json())
         .then((value) => value.value);
-      const filekeydigest = await blobDigest(file.key);
+      const filekeydigest = setTimeout(() => blobDigest(file.key))
 
       if (thumbnailschildlen.includes(`${filekeydigest}.png`)) return filekeydigest;
 
       if (file.type.startsWith("image/") || file.type === "video/mp4") {
         try {
-          const thumbnailBlob = await generateThumbnail(file);
+          const thumbnailBlob = setTimeout(() => generateThumbnail(file));
           const thumbnailUploadUrl = `/api/write/items/_$flaredrive$/thumbnails/${filekeydigest}.png`;
 
           try {
-            await axios.put(thumbnailUploadUrl, thumbnailBlob);
+            setTimeout(() => axios.put(thumbnailUploadUrl, thumbnailBlob));
           } catch (error) {
             fetch("/api/write/")
               .then((value) => {
