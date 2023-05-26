@@ -412,7 +412,7 @@ export default {
       setTimeout(() => this.processUploadQueue());
     },
 
-    async createThumbnail(file) {
+    createThumbnail(file) {
       const thumbnailschildlen = fetch(`/api/children/_$flaredrive$/thumbnails/`)
         .then((value) => value.json())
         .then((value) => value.value);
