@@ -100,7 +100,11 @@
           <div class="file-item">
             <MimeIcon
               :content-type="file.httpMetadata.contentType"
-              :thumbnail="`/raw/_$flaredrive$/thumbnails/${createThumbnail(file)}.png`"
+              :thumbnail="
+                file.customMetadata.thumbnail
+                  ? `/raw/_$flaredrive$/thumbnails/${file.customMetadata.thumbnail}.png`
+                  : `/raw/${file.key}`
+              "
             />
             <div>
               <div class="file-name" v-text="file.key.split('/').pop()"></div>
@@ -410,37 +414,6 @@ export default {
       }));
       this.uploadQueue.push(...uploadTasks);
       setTimeout(() => this.processUploadQueue());
-    },
-
-    createThumbnail(file) {
-      const thumbnailschildlen = fetch(`/api/children/_$flaredrive$/thumbnails/`)
-        .then((value) => value.json())
-        .then((value) => value.value);
-      const filekeydigest = setTimeout(() => blobDigest(file.key))
-
-      if (thumbnailschildlen.includes(`${filekeydigest}.png`)) return filekeydigest;
-
-      if (file.type.startsWith("image/") || file.type === "video/mp4") {
-        try {
-          const thumbnailBlob = setTimeout(() => generateThumbnail(file));
-          const thumbnailUploadUrl = `/api/write/items/_$flaredrive$/thumbnails/${filekeydigest}.png`;
-
-          try {
-            setTimeout(() => axios.put(thumbnailUploadUrl, thumbnailBlob));
-          } catch (error) {
-            fetch("/api/write/")
-              .then((value) => {
-                if (value.redirected) window.location.href = value.url;
-              })
-              .catch(() => {});
-            console.log(`Upload ${filekeydigest}.png failed`);
-          }
-        } catch (error) {
-          console.log(`Generate thumbnail failed`);
-        }
-      }
-
-      return filekeydigest;
     },
   },
 
